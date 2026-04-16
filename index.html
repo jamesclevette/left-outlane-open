@@ -11,12 +11,16 @@
       font-family: Arial, sans-serif;
       background: #111;
       color: #f5f5f5;
+      overflow: hidden;
+      position: relative;
     }
 
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
       padding: 30px;
+      position: relative;
+      z-index: 1;
     }
 
     .hero {
@@ -36,7 +40,7 @@
     }
 
     .box {
-      background: #1a1a1a;
+      background: rgba(26, 26, 26, 0.92);
       border: 1px solid #333;
       border-radius: 16px;
       padding: 20px;
@@ -72,10 +76,28 @@
       color: #aaa;
       font-size: 1rem;
     }
+
+    /* Bouncing logo */
+    .floating-logo {
+      position: fixed;
+      width: 240px;
+      height: 240px;
+      background-image: url('b1b-logo.png');
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      opacity: 0.06;
+      z-index: 0;
+      pointer-events: none;
+    }
   </style>
 </head>
 
 <body>
+
+  <!-- Bouncing logo -->
+  <div class="floating-logo" id="floatingLogo"></div>
+
   <div class="wrap">
 
     <div class="hero">
@@ -106,6 +128,7 @@
   </div>
 
   <script>
+    // 🔗 PASTE YOUR GOOGLE SHEET CSV LINK HERE
     const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRXqYOBiMAqP2MOcDlEJ9rDTIZBrCfb3Lb0A_l3t9tzTdOOoGcTiUrw14Vw9euaMiptQgSJipp7GXX2/pub?gid=438399248&single=true&output=csv";
 
     function parseCSV(text) {
@@ -148,6 +171,35 @@
     }
 
     loadLeaderboard();
+
+    // 🎯 REAL bouncing logo logic
+    const logo = document.getElementById("floatingLogo");
+
+    let x = 50;
+    let y = 50;
+    let dx = 1.2;
+    let dy = 1.0;
+
+    function animateLogo() {
+      const logoWidth = logo.offsetWidth;
+      const logoHeight = logo.offsetHeight;
+      const maxX = window.innerWidth - logoWidth;
+      const maxY = window.innerHeight - logoHeight;
+
+      x += dx;
+      y += dy;
+
+      if (x <= 0 || x >= maxX) dx *= -1;
+      if (y <= 0 || y >= maxY) dy *= -1;
+
+      logo.style.left = x + "px";
+      logo.style.top = y + "px";
+
+      requestAnimationFrame(animateLogo);
+    }
+
+    animateLogo();
   </script>
+
 </body>
 </html>
