@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Left Outlane Open League</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #f5f5f5;
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: #1c1c1c;
+      border: 2px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+    .tagline {
+      font-size: 1.2rem;
+      margin: 12px 0;
+    }
+    .box {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #181818;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background: #262626;
+    }
+    .small {
+      font-size: 0.95rem;
+      color: #ccc;
+    }
+    .loading, .error {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+    }
+    .loading {
+      background: #1f2530;
+      color: #d7e6ff;
+    }
+    .error {
+      background: #301919;
+      color: #ffd8d8;
+      display: none;
+    }
+    .footer {
+      text-align: center;
+      color: #bbb;
+      margin-top: 24px;
+      font-size: 0.95rem;
+    }
+    code.inline {
+      background: #222;
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #fff;
+    }
+    @media (max-width: 700px) {
+      body {
+        font-size: 16px;
+      }
+      th, td {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>B1B Pinball Presents</h1>
+      <h2>Left Outlane Open League</h2>
+      <p class="tagline"><strong>The “I Might Show Up” League</strong></p>
+      <p>Miss a week? Nobody cares. No commitment. Who gives a flip.</p>
+      <p><strong>Thursdays @ The Left Outlane</strong></p>
+    </section>
+
+    <section class="box">
+      <h3>About the League</h3>
+      <p>
+        Love pinball but can’t commit every week? This league is built for you.
+        Show up when you want, skip when you need, and still compete.
+      </p>
+      <ul>
+        <li>No weekly commitment</li>
+        <li>Drop in when you can</li>
+        <li>Track your scores all season</li>
+        <li>Still have a shot to win</li>
+      </ul>
+    </section>
+
+    <section class="box">
+      <h3>Current Leaderboard</h3>
+      <p class="small">This table auto-loads from your published Google Sheet.</p>
+      <div id="loading" class="loading">Loading leaderboard...</div>
+      <div id="error" class="error">Could not load leaderboard data. Double-check your published Google Sheet link.</div>
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Points</th>
+            <th>Weeks Played</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+        </tbody>
+      </table>
+    </section>
+
+    <section class="box">
+      <h3>League Info</h3>
+      <p><strong>Format:</strong> Flexible weekly attendance. Come when you can.</p>
+      <p><strong>Location:</strong> The Left Outlane</p>
+      <p><strong>Questions:</strong> james@b1bpinball.com</p>
+    </section>
+
+    <section class="box">
+      <h3>How to Update This Page</h3>
+      <ol>
+        <li>Copy your finished leaderboard from Excel into a Google Sheet tab.</li>
+        <li>Make sure the sheet columns are: <strong>Rank</strong>, <strong>Player</strong>, <strong>Points</strong>, <strong>Weeks Played</strong>.</li>
+        <li>Publish that specific sheet tab to the web as CSV.</li>
+        <li>Replace the <code class="inline">sheetCsvUrl</code> value in this file with your published CSV link.</li>
+        <li>Save the file and upload it to GitHub Pages.</li>
+      </ol>
+      <p class="small">Tip: Keep row 1 as your header row in Google Sheets.</p>
+    </section>
+
+    <div class="footer">
+      Last updated: <span id="last-updated">Waiting for sheet data...</span>
+    </div>
+  </div>
+
+  <script>
+    // PASTE YOUR PUBLISHED GOOGLE SHEET CSV LINK HERE
+    const sheetCsvUrl = "PASTE_YOUR_GOOGLE_SHEET_CSV_URL_HERE";
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let current = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(current);
+          current = "";
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          if (current !== "" || row.length > 0) {
+            row.push(current);
+            rows.push(row);
+            row = [];
+            current = "";
+          }
+        } else {
+          current += char;
+        }
+      }
+
+      if (current !== "" || row.length > 0) {
+        row.push(current);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    async function loadLeaderboard() {
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const tbody = document.getElementById('leaderboard-body');
+      const lastUpdated = document.getElementById('last-updated');
+
+      if (!sheetCsvUrl || sheetCsvUrl.includes('PASTE_YOUR_GOOGLE_SHEET_CSV_URL_HERE')) {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = 'Add your published Google Sheet CSV URL in the code first.';
+        return;
+      }
+
+      try {
+        const response = await fetch(sheetCsvUrl, { cache: 'no-store' });
+        const csvText = await response.text();
+        const rows = parseCSV(csvText);
+
+        if (rows.length < 2) {
+          throw new Error('Not enough data in sheet.');
+        }
+
+        const dataRows = rows.slice(1).filter(row => row.some(cell => cell.trim() !== ''));
+        tbody.innerHTML = '';
+
+        dataRows.forEach((row) => {
+          const tr = document.createElement('tr');
+          const rank = row[0] || '';
+          const player = row[1] || '';
+          const points = row[2] || '';
+          const weeksPlayed = row[3] || '';
+
+          tr.innerHTML = `
+            <td>${rank}</td>
+            <td>${player}</td>
+            <td>${points}</td>
+            <td>${weeksPlayed}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        loading.style.display = 'none';
+        error.style.display = 'none';
+        lastUpdated.textContent = new Date().toLocaleString();
+      } catch (err) {
+        console.error(err);
+        loading.style.display = 'none';
+        error.style.display = 'block';
+      }
+    }
+
+    loadLeaderboard();
+  </script>
+</body>
+</html>
