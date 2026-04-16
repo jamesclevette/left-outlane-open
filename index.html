@@ -77,29 +77,32 @@
       font-size: 1rem;
     }
 
-    /* Bouncing logo */
     .floating-logo {
       position: fixed;
       width: 240px;
       height: 240px;
-      background-image: url('b1b-logo.png');
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
-      opacity: 0.06;
       z-index: 0;
       pointer-events: none;
+      opacity: 0.12;
+      transition: filter 0.2s linear;
+    }
+
+    .floating-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      filter: brightness(0) saturate(100%) invert(100%);
     }
   </style>
 </head>
 
 <body>
-
-  <!-- Bouncing logo -->
-  <div class="floating-logo" id="floatingLogo"></div>
+  <div class="floating-logo" id="floatingLogo">
+    <img id="floatingLogoImg" src="b1b-logo.png" alt="">
+  </div>
 
   <div class="wrap">
-
     <div class="hero">
       <h1>Left Outlane Open League</h1>
       <h2>The “I Might Show Up” League</h2>
@@ -124,12 +127,10 @@
     <div class="footer">
       Last updated: <span id="last-updated">Waiting...</span>
     </div>
-
   </div>
 
   <script>
-    // 🔗 PASTE YOUR GOOGLE SHEET CSV LINK HERE
-    const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRXqYOBiMAqP2MOcDlEJ9rDTIZBrCfb3Lb0A_l3t9tzTdOOoGcTiUrw14Vw9euaMiptQgSJipp7GXX2/pub?gid=438399248&single=true&output=csv";
+    const sheetCsvUrl = "PASTE YOUR GOOGLE CSV LINK HERE";
 
     function parseCSV(text) {
       return text.trim().split("\n").map(row => row.split(","));
@@ -172,13 +173,26 @@
 
     loadLeaderboard();
 
-    // 🎯 REAL bouncing logo logic
     const logo = document.getElementById("floatingLogo");
+    const logoImg = document.getElementById("floatingLogoImg");
 
     let x = 50;
     let y = 50;
-    let dx = 1.2;
-    let dy = 1.0;
+    let dx = 3.8;
+    let dy = 3.2;
+
+    const hues = [0, 35, 60, 120, 180, 220, 280, 320];
+    let hueIndex = 0;
+
+    function updateLogoColor() {
+      const hue = hues[hueIndex];
+      logoImg.style.filter = `brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(${hue}deg) brightness(1.1)`;
+    }
+
+    function changeColor() {
+      hueIndex = (hueIndex + 1) % hues.length;
+      updateLogoColor();
+    }
 
     function animateLogo() {
       const logoWidth = logo.offsetWidth;
@@ -189,8 +203,31 @@
       x += dx;
       y += dy;
 
-      if (x <= 0 || x >= maxX) dx *= -1;
-      if (y <= 0 || y >= maxY) dy *= -1;
+      let bounced = false;
+
+      if (x <= 0) {
+        x = 0;
+        dx *= -1;
+        bounced = true;
+      } else if (x >= maxX) {
+        x = maxX;
+        dx *= -1;
+        bounced = true;
+      }
+
+      if (y <= 0) {
+        y = 0;
+        dy *= -1;
+        bounced = true;
+      } else if (y >= maxY) {
+        y = maxY;
+        dy *= -1;
+        bounced = true;
+      }
+
+      if (bounced) {
+        changeColor();
+      }
 
       logo.style.left = x + "px";
       logo.style.top = y + "px";
@@ -198,8 +235,8 @@
       requestAnimationFrame(animateLogo);
     }
 
+    updateLogoColor();
     animateLogo();
   </script>
-
 </body>
 </html>
