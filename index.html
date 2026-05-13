@@ -15,68 +15,6 @@
       position: relative;
     }
 
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 30px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-
-    h1 {
-      font-size: 3rem;
-      margin: 0;
-    }
-
-    h2 {
-      font-size: 1.4rem;
-      color: #ccc;
-      margin-top: 5px;
-    }
-
-    .box {
-      background: rgba(26, 26, 26, 0.92);
-      border: 1px solid #333;
-      border-radius: 16px;
-      padding: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 1.3rem;
-    }
-
-    th, td {
-      border: 1px solid #333;
-      padding: 16px;
-      text-align: left;
-    }
-
-    th {
-      background: #262626;
-      font-size: 1.2rem;
-    }
-
-    .loading {
-      padding: 12px;
-      margin-bottom: 10px;
-      background: #1f2530;
-      border-radius: 8px;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 15px;
-      color: #aaa;
-      font-size: 1rem;
-    }
-
     .floating-logo {
       position: fixed;
       width: 240px;
@@ -84,7 +22,6 @@
       z-index: 0;
       pointer-events: none;
       opacity: 0.12;
-      transition: filter 0.2s linear;
     }
 
     .floating-logo img {
@@ -92,7 +29,76 @@
       height: 100%;
       object-fit: contain;
       display: block;
-      filter: brightness(0) saturate(100%) invert(100%);
+    }
+
+    .wrap {
+      width: 96vw;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      margin: 0;
+    }
+
+    h2 {
+      font-size: 1rem;
+      color: #ccc;
+      margin: 4px 0 0;
+    }
+
+    .box {
+      background: rgba(26, 26, 26, 0.94);
+      border: 1px solid #333;
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid #333;
+      padding: 8px 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #262626;
+      font-weight: bold;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+      min-width: 180px;
+    }
+
+    .loading {
+      padding: 10px;
+      margin-bottom: 10px;
+      background: #1f2530;
+      border-radius: 8px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 10px;
+      color: #aaa;
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -110,18 +116,7 @@
 
     <div class="box">
       <div id="loading" class="loading">Loading leaderboard...</div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Rank</th>
-            <th>Player</th>
-            <th>Points</th>
-            <th>Weeks Played</th>
-          </tr>
-        </thead>
-        <tbody id="leaderboard-body"></tbody>
-      </table>
+      <table id="leaderboard-table"></table>
     </div>
 
     <div class="footer">
@@ -130,15 +125,50 @@
   </div>
 
   <script>
-    const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRXqYOBiMAqP2MOcDlEJ9rDTIZBrCfb3Lb0A_l3t9tzTdOOoGcTiUrw14Vw9euaMiptQgSJipp7GXX2/pub?gid=438399248&single=true&output=csv";
+    const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/1K07u7EoAzwRBQCO2GBxfmnSklryGxsWrpqjWTdtD-wE/edit?gid=438399248#gid=438399248";
 
     function parseCSV(text) {
-      return text.trim().split("\n").map(row => row.split(","));
+      const rows = [];
+      let row = [];
+      let cell = "";
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === "," && !inQuotes) {
+          row.push(cell);
+          cell = "";
+        } else if ((char === "\n" || char === "\r") && !inQuotes) {
+          if (char === "\r" && next === "\n") i++;
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = "";
+        } else {
+          cell += char;
+        }
+      }
+
+      if (cell || row.length) {
+        row.push(cell);
+        rows.push(row);
+      }
+
+      return rows.filter(r => r.some(c => c.trim() !== ""));
     }
 
     async function loadLeaderboard() {
       const loading = document.getElementById("loading");
-      const tbody = document.getElementById("leaderboard-body");
+      const table = document.getElementById("leaderboard-table");
       const lastUpdated = document.getElementById("last-updated");
 
       try {
@@ -146,21 +176,29 @@
         const text = await response.text();
         const rows = parseCSV(text);
 
-        const data = rows.slice(1);
-        tbody.innerHTML = "";
+        table.innerHTML = "";
 
-        data.forEach(row => {
-          if (row.length < 4) return;
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
 
+        rows.forEach((row, index) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row[0]}</td>
-            <td>${row[1]}</td>
-            <td>${row[2]}</td>
-            <td>${row[3]}</td>
-          `;
-          tbody.appendChild(tr);
+
+          row.forEach(cell => {
+            const el = document.createElement(index === 0 ? "th" : "td");
+            el.textContent = cell;
+            tr.appendChild(el);
+          });
+
+          if (index === 0) {
+            thead.appendChild(tr);
+          } else {
+            tbody.appendChild(tr);
+          }
         });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
 
         loading.style.display = "none";
         lastUpdated.textContent = new Date().toLocaleTimeString();
@@ -225,9 +263,7 @@
         bounced = true;
       }
 
-      if (bounced) {
-        changeColor();
-      }
+      if (bounced) changeColor();
 
       logo.style.left = x + "px";
       logo.style.top = y + "px";
