@@ -15,6 +15,7 @@
       position: relative;
     }
 
+    /* Floating bouncing logo */
     .floating-logo {
       position: fixed;
       width: 240px;
@@ -31,22 +32,23 @@
       display: block;
     }
 
+    /* Main content */
     .wrap {
       width: 96vw;
-      max-width: 1500px;
+      max-width: 1600px;
       margin: 0 auto;
-      padding: 22px;
+      padding: 18px;
       position: relative;
       z-index: 1;
     }
 
     .hero {
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     h1 {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
       margin: 0;
     }
 
@@ -60,9 +62,10 @@
       background: rgba(26, 26, 26, 0.94);
       border: 1px solid #333;
       border-radius: 14px;
-      padding: 12px;
+      padding: 10px;
     }
 
+    /* Table */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -71,7 +74,7 @@
 
     th, td {
       border: 1px solid #333;
-      padding: 8px 10px;
+      padding: 7px 10px;
       text-align: center;
       white-space: nowrap;
     }
@@ -98,17 +101,20 @@
       text-align: center;
       margin-top: 10px;
       color: #aaa;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
   </style>
 </head>
 
 <body>
+
+  <!-- Floating Logo -->
   <div class="floating-logo" id="floatingLogo">
     <img id="floatingLogoImg" src="b1b-logo.png" alt="">
   </div>
 
   <div class="wrap">
+
     <div class="hero">
       <h1>Left Outlane Open League</h1>
       <h2>The “I Might Show Up” League</h2>
@@ -116,16 +122,28 @@
 
     <div class="box">
       <div id="loading" class="loading">Loading leaderboard...</div>
+
       <table id="leaderboard-table"></table>
     </div>
 
     <div class="footer">
-      Last updated: <span id="last-updated">Waiting...</span>
+      Last updated:
+      <span id="last-updated">Waiting...</span>
     </div>
+
   </div>
 
   <script>
+
+    /* ======================================================
+       PASTE YOUR GOOGLE SHEET CSV LINK BELOW
+       ====================================================== */
+
     const sheetCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRXqYOBiMAqP2MOcDlEJ9rDTIZBrCfb3Lb0A_l3t9tzTdOOoGcTiUrw14Vw9euaMiptQgSJipp7GXX2/pub?gid=438399248&single=true&output=csv";
+
+    /* ======================================================
+       CSV PARSER
+       ====================================================== */
 
     function parseCSV(text) {
       const rows = [];
@@ -144,16 +162,21 @@
           } else {
             inQuotes = !inQuotes;
           }
-        } else if (char === "," && !inQuotes) {
+        }
+        else if (char === "," && !inQuotes) {
           row.push(cell);
           cell = "";
-        } else if ((char === "\n" || char === "\r") && !inQuotes) {
+        }
+        else if ((char === "\n" || char === "\r") && !inQuotes) {
           if (char === "\r" && next === "\n") i++;
+
           row.push(cell);
           rows.push(row);
+
           row = [];
           cell = "";
-        } else {
+        }
+        else {
           cell += char;
         }
       }
@@ -163,31 +186,53 @@
         rows.push(row);
       }
 
-      return rows.filter(r => r.some(c => c.trim() !== ""));
+      return rows.filter(r =>
+        r.some(c => c.trim() !== "")
+      );
     }
 
+    /* ======================================================
+       LOAD LEADERBOARD
+       ====================================================== */
+
     async function loadLeaderboard() {
+
       const loading = document.getElementById("loading");
       const table = document.getElementById("leaderboard-table");
       const lastUpdated = document.getElementById("last-updated");
 
       try {
-        const response = await fetch(sheetCsvUrl + "&cachebust=" + Date.now());
+
+        const response = await fetch(
+          sheetCsvUrl + "&cachebust=" + Date.now()
+        );
+
         const text = await response.text();
+
         const rows = parseCSV(text);
+
+        /* Skip row 1 (title row) */
+        const rowsForTable = rows.slice(1);
 
         table.innerHTML = "";
 
         const thead = document.createElement("thead");
         const tbody = document.createElement("tbody");
 
-        rows.forEach((row, index) => {
+        rowsForTable.forEach((row, index) => {
+
           const tr = document.createElement("tr");
 
           row.forEach(cell => {
-            const el = document.createElement(index === 0 ? "th" : "td");
+
+            const el = document.createElement(
+              index === 0 ? "th" : "td"
+            );
+
             el.textContent = cell;
+
             tr.appendChild(el);
+
           });
 
           if (index === 0) {
@@ -195,48 +240,91 @@
           } else {
             tbody.appendChild(tr);
           }
+
         });
 
         table.appendChild(thead);
         table.appendChild(tbody);
 
         loading.style.display = "none";
-        lastUpdated.textContent = new Date().toLocaleTimeString();
 
-      } catch (err) {
-        loading.textContent = "Error loading leaderboard";
+        lastUpdated.textContent =
+          new Date().toLocaleTimeString();
+
+      }
+
+      catch (err) {
+
         console.error(err);
+
+        loading.textContent =
+          "Error loading leaderboard";
+
       }
     }
 
     loadLeaderboard();
+
+    /* ======================================================
+       BOUNCING LOGO
+       ====================================================== */
 
     const logo = document.getElementById("floatingLogo");
     const logoImg = document.getElementById("floatingLogoImg");
 
     let x = 50;
     let y = 50;
-    let dx = 3.8;
-    let dy = 3.2;
 
-    const hues = [0, 35, 60, 120, 180, 220, 280, 320];
+    let dx = 4.2;
+    let dy = 3.6;
+
+    const hues = [
+      0,
+      35,
+      60,
+      120,
+      180,
+      220,
+      280,
+      320
+    ];
+
     let hueIndex = 0;
 
     function updateLogoColor() {
+
       const hue = hues[hueIndex];
-      logoImg.style.filter = `brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(3000%) hue-rotate(${hue}deg) brightness(1.1)`;
+
+      logoImg.style.filter =
+        `brightness(0)
+         saturate(100%)
+         invert(100%)
+         sepia(100%)
+         saturate(3000%)
+         hue-rotate(${hue}deg)
+         brightness(1.1)`;
+
     }
 
     function changeColor() {
-      hueIndex = (hueIndex + 1) % hues.length;
+
+      hueIndex =
+        (hueIndex + 1) % hues.length;
+
       updateLogoColor();
+
     }
 
     function animateLogo() {
+
       const logoWidth = logo.offsetWidth;
       const logoHeight = logo.offsetHeight;
-      const maxX = window.innerWidth - logoWidth;
-      const maxY = window.innerHeight - logoHeight;
+
+      const maxX =
+        window.innerWidth - logoWidth;
+
+      const maxY =
+        window.innerHeight - logoHeight;
 
       x += dx;
       y += dy;
@@ -247,7 +335,9 @@
         x = 0;
         dx *= -1;
         bounced = true;
-      } else if (x >= maxX) {
+      }
+
+      else if (x >= maxX) {
         x = maxX;
         dx *= -1;
         bounced = true;
@@ -257,22 +347,29 @@
         y = 0;
         dy *= -1;
         bounced = true;
-      } else if (y >= maxY) {
+      }
+
+      else if (y >= maxY) {
         y = maxY;
         dy *= -1;
         bounced = true;
       }
 
-      if (bounced) changeColor();
+      if (bounced) {
+        changeColor();
+      }
 
       logo.style.left = x + "px";
       logo.style.top = y + "px";
 
       requestAnimationFrame(animateLogo);
+
     }
 
     updateLogoColor();
     animateLogo();
+
   </script>
+
 </body>
 </html>
