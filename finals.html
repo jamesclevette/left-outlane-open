@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>B1B Pinball Spring 2026 Final Standings</title>
+    <title>Thursday League Top 15 Final Standings</title>
 
     <style>
         body {
@@ -9,17 +9,13 @@
             color: white;
             font-family: Arial, sans-serif;
             margin: 20px;
+            overflow: hidden;
         }
 
         h1 {
             text-align: center;
             color: #ffcc00;
             font-size: 48px;
-        }
-
-        h2 {
-            color: #66ccff;
-            font-size: 32px;
         }
 
         table {
@@ -42,13 +38,28 @@
         tr:nth-child(even) {
             background: #222;
         }
+
+        #logo {
+            position: fixed;
+            width: 150px;
+            height: auto;
+            opacity: 0.15;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body > *:not(#logo) {
+            position: relative;
+            z-index: 1;
+        }
     </style>
 </head>
 
 <body>
 
-<h1>Thursday League Top 15 Final Standings</h1>
+<img id="logo" src="b1b-logo.png" alt="B1B Logo">
 
+<h1>Thursday League Top 15 Final Standings</h1>
 
 <table>
 <tr>
@@ -56,7 +67,7 @@
     <th>Points</th>
 </tr>
 
-<tr><td>1. Ayla </td><td>97</td></tr>
+<tr><td>1. Ayla</td><td>97</td></tr>
 <tr><td>2. Juan Pequeno</td><td>68</td></tr>
 <tr><td>3. Oceansdad</td><td>68</td></tr>
 <tr><td>4. Ms Jackson</td><td>59</td></tr>
@@ -76,9 +87,42 @@
 <p style="text-align:center;font-size:48px;">
 🏆 CONGRATULATIONS MS JACKSON ON WINNING THE TOURNAMENT! 🏆
 </p>
+
 <p style="text-align:center;font-size:28px;">
-New Seaons Starts June 25th!
+New Season Starts June 25th!
 </p>
+
+<script>
+const logo = document.getElementById("logo");
+
+let x = 100;
+let y = 100;
+let dx = 2;
+let dy = 2;
+
+function animate() {
+    const logoWidth = logo.offsetWidth;
+    const logoHeight = logo.offsetHeight;
+
+    x += dx;
+    y += dy;
+
+    if (x + logoWidth >= window.innerWidth || x <= 0) {
+        dx = -dx;
+    }
+
+    if (y + logoHeight >= window.innerHeight || y <= 0) {
+        dy = -dy;
+    }
+
+    logo.style.left = x + "px";
+    logo.style.top = y + "px";
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
 
 </body>
 </html>
