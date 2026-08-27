@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Left Out Lane Open League</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #111;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* B1B BACKGROUND WATERMARK */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75%;
+            max-width: 1000px;
+            opacity: 0.06;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* EVERYTHING ELSE SITS ABOVE WATERMARK */
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        /* LOOL LOGO */
+        .lool-logo {
+            width: 70%;
+            max-width: 950px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .ai-note {
+            margin-top: -5px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: #777;
+            font-style: italic;
+        }
+
+        /* THURSDAY BANNER */
+        .thursday {
+            font-size: 52px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 8px 0 0 0;
+            letter-spacing: 5px;
+        }
+
+        /* START DATE */
+        .start-date {
+            font-size: 38px;
+            font-weight: bold;
+            color: #66ccff;
+            margin: 5px 0 20px 0;
+        }
+
+        .start-date span {
+            color: white;
+        }
+
+        /* LEAGUE INFO BOX */
+        .league-info {
+            width: 75%;
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 18px 30px;
+            background: rgba(20, 20, 20, 0.82);
+            border: 2px solid #555;
+            border-radius: 15px;
+        }
+
+        .welcome {
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 0 0 14px 0;
+        }
+
+        .details {
+            font-size: 25px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .highlight {
+            color: #66ccff;
+            font-weight: bold;
+        }
+
+        .no-worries {
+            font-size: 27px;
+            font-weight: bold;
+            margin: 15px 0 3px 0;
+        }
+
+        .drops {
+            font-size: 22px;
+            color: #ccc;
+            margin: 0 0 14px 0;
+        }
+
+        .tournament {
+            font-size: 27px;
+            font-weight: bold;
+            color: #ffcc00;
+            margin: 12px 0 0 0;
+        }
+
+        /* BOTTOM LINE */
+        .footer {
+            margin-top: 18px;
+            font-size: 20px;
+            color: #aaa;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- B1B WATERMARK -->
+<img class="watermark" src="b1b-logo.png" alt="B1B Pinball">
+
+<div class="content">
+
+    <!-- LOOL LOGO -->
+    <img class="lool-logo"
+         src="LOOL%20image.png"
+         alt="Left Out Lane Open League">
+
+    <div class="ai-note">
+        Yep, I used AI to create this image. Sue me.
+    </div>
+
+    <!-- LEAGUE NIGHT -->
+    <div class="thursday">
+        THURSDAYS
+    </div>
+
+    <!-- START DATE -->
+    <div class="start-date">
+        <span>NEW SEASON STARTS</span> SEPTEMBER 3RD
+    </div>
+
+    <!-- INFORMATION -->
+    <div class="league-info">
+
+        <div class="welcome">
+            ALL SKILL LEVELS WELCOME
+        </div>
+
+        <div class="details">
+            <span class="highlight">8 Week Season</span>
+            &nbsp; • &nbsp;
+            Casual Competition
+            &nbsp; • &nbsp;
+            Play 5 Games Each Week
+        </div>
+
+        <div class="no-worries">
+            Can't make it every Thursday? No worries!
+        </div>
+
+        <div class="drops">
+            Your <strong>2 lowest weeks are dropped.</strong>
+        </div>
+
+        <div class="tournament">
+            🏆 Everyone Qualifies for a Season-End Tournament 🏆
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Come play pinball. Meet some people. Have some fun.
+    </div>
+
+</div>
+
+</body>
+</html>
